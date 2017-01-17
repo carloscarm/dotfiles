@@ -16,6 +16,9 @@ function doIt() {
 		--exclude "bin" \
 		--exclude "init" \
 		--exclude "brew.sh" \
+		--exclude "make_bkup.sh" \
+		--exclude ".vim/backups/" \
+		--exclude ".vim/swaps/" \
 		-avh --no-perms . ~;
 	source ~/.bash_profile;
 }
