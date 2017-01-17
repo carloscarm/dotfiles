@@ -2,16 +2,39 @@
 
 cd "$(dirname "${BASH_SOURCE}")";
 
-git pull origin master;
+#git pull origin master;
 
 function doIt() {
-	rsync --exclude ".git/" \
-		--exclude ".DS_Store" \
-		--exclude ".osx" \
-		--exclude "bootstrap.sh" \
-		--exclude "README.md" \
-		--exclude "LICENSE-MIT.txt" \
-		-avh --no-perms . ~;
+	if [ "$(uname)" == "Darwin" ]; then
+		rsync --exclude ".git/" \
+			--exclude ".DS_Store" \
+			--exclude ".osx" \
+			--exclude "bootstrap.sh" \
+			--exclude "README.md" \
+			--exclude "LICENSE-MIT.txt" \
+			--exclude "bin" \
+			--exclude "init" \
+			--exclude "brew.sh" \
+			--exclude "make_bkup.sh" \
+			--exclude "check_diffs.sh" \
+			-avh --no-perms . ~;
+	else
+		rsync --exclude ".git/" \
+			--exclude ".DS_Store" \
+			--exclude ".osx" \
+			--exclude "bootstrap.sh" \
+			--exclude "README.md" \
+			--exclude "LICENSE-MIT.txt" \
+			--exclude ".macos" \
+			--exclude ".mac_functions" \
+			--exclude ".mac_aliases" \
+			--exclude "bin" \
+			--exclude "init" \
+			--exclude "brew.sh" \
+			--exclude "make_bkup.sh" \
+			--exclude "check_diffs.sh" \
+			-avh --no-perms . ~;
+	fi
 	source ~/.bash_profile;
 }
 

@@ -5,11 +5,6 @@ function mkd() {
 	mkdir -p "$@" && cd "$_";
 }
 
-# Change working directory to the top-most Finder window location
-function cdf() { # short for `cdfinder`
-	cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
-}
-
 # Create a .tar.gz archive, using `zopfli`, `pigz` or `gzip` for compression
 function targz() {
 	local tmpFile="${@%/}.tar";
@@ -233,4 +228,136 @@ function o() {
 # small enough for one screen.
 function tre() {
 	tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
+}
+
+### Persistent History
+
+export HISTTIMEFORMAT='%F %T '
+
+log_bash_persistent_history()
+{
+    [[ $(history 1) =~ ^\ *[0-9]+\ +([^\ ]+\ [^\ ]+)\ +(.*)$ ]]
+    local date_part="${BASH_REMATCH[1]}"
+    local command_part="${BASH_REMATCH[2]}"
+    local host_part="$USER@$(hostname)"
+    #if [ "$UID" == "0"]; then
+    #    "$host_part"="#@$host_part"
+    #fi
+    if [[ "$command_part" != "$PERSISTENT_HISTORY_LAST" ]] && [[ "$command_part" != "ls" ]]
+    then
+        echo $date_part "|" $host_part "|" "$command_part" >> ~/.persistent_history
+        export PERSISTENT_HISTORY_LAST="$command_part"
+    fi
+}
+
+# Stuff to do on PROMPT_COMMAND
+run_on_prompt_command()
+{
+    log_bash_persistent_history
+}
+
+PROMPT_COMMAND="run_on_prompt_command"
+
+#alias vphgrep='cat ~/.persistent_history|grep --color'
+#alias pggrep='cat ~/proj/ph_log/.persistent_history|grep --color'
+alias hgrep='history|grep --color'
+
+vphgrep()
+{
+    if [ -z "${1}" ]; then
+        cat ~/.persistent_history
+    else
+        cat ~/.persistent_history | grep --color "${@}"
+    fi
+}
+
+phgrep()
+{
+    vphgrep "${@}" | cut --delimiter=\| --fields=3-
+}
+
+vpggrep()
+{
+    if [ -r ~/proj/ph_log/.persistent_history ]; then
+        if [ -z "${1}" ]; then
+            cat ~/proj/ph_log/.persistent_history
+        else
+            cat ~/proj/ph_log/.persistent_history | grep --color "${@}"
+        fi
+    fi
+}
+
+pggrep()
+{
+    vpggrep "${@}" | cut --delimiter=\| --fields=3-
+}
+
+
+
+run_remote()
+{
+	if [ -z "${1}" ]; then
+		echo "run_remote: You need to pass a command to run on \$REMOTE_HOSTS"
+		return 1
+	else
+		if [[ x$REMOTE_HOSTS != x ]]; then
+			for h in $REMOTE_HOSTS; do
+				printf '\E[31m'; echo ssh $h "$@"; printf '\E[0m'
+                if [ -r $HOME/.ssh/config.noports ]; then
+				    ssh -F $HOME/.ssh/config.noports $h "$@"
+                else
+                    ssh $h "$@"
+                fi
+			done
+		fi
+	fi
+}
+gen-etags()
+{
+        find . -regex '.*\.\(c\|cpp\|h\)$' -print0 | xargs -0 etags
+}
+
+sv() {
+    local -r ACTION="${1}"
+    if ! grep --extended-regexp --quiet --ignore-case "^(en|dis)abled$" <<< "${ACTION}"; then
+        echo "Wrong arguments ... "
+        return 1
+    fi
+    case "${ACTION}" in
+        'enabled')
+            systemctl list-unit-files | fgrep 'enabled'
+            ;;
+        'disabled')
+            systemctl list-unit-files | fgrep 'disabled'
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+svint() {
+    local -r ACTION="${1}"
+    local svc
+    if ! grep --extended-regexp --quiet --ignore-case "^(e|d)$" <<< "${ACTION}"; then
+        echo "Wrong arguments ... "
+        return 1
+    fi
+    case "${ACTION}" in
+        'd')
+            svc=$(sv enabled | dmenu -b -l 40)
+            if [[ ! -z "${svc}" ]]; then
+                sudo systemctl disable $(awk '{print $1}' <<< ${svc})
+            fi
+            ;;
+        'e')
+            svc=$(sv disabled | dmenu -b -l 40)
+            if [[ ! -z "${svc}" ]]; then
+                sudo systemctl enable $(awk '{print $1}' <<< ${svc})
+            fi
+            ;;
+        *)
+            return 1
+            ;;
+    esac
 }
