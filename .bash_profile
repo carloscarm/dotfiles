@@ -9,6 +9,11 @@ for file in ~/.{path,bash_prompt,exports,aliases,functions,extra}; do
 done;
 unset file;
 
+if [ "$(uname)" == "Darwin" ]; then
+	  [ -r .mac_aliases ] && [ -f .mac_aliases ] && source .mac_aliases;
+	  [ -r .mac_functions ] && [ -f .mac_functions ] && source .mac_functions;
+fi
+
 # Case-insensitive globbing (used in pathname expansion)
 shopt -s nocaseglob;
 
