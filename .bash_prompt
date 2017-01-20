@@ -120,3 +120,6 @@ export PS1;
 
 PS2="\[${yellow}\]→ \[${reset}\]";
 export PS2;
+
+# reduce to max 4 directory levels
+export PROMPT_DIRTRIM=4
