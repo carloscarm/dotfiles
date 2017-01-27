@@ -1,3 +1,6 @@
+# remap C-a to C-j and C-J
+escape ^Jj
+
 # Disable the startup message
 startup_message off
 
