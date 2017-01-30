@@ -259,5 +259,7 @@ run_on_prompt_command()
 PROMPT_COMMAND="run_on_prompt_command"
 
 alias phgrep='cat ~/.persistent_history|grep --color'
+alias pggrep='cat ~/proj/ph_log/.persistent_history|grep --color'
 alias hgrep='history|grep --color'
+
 
