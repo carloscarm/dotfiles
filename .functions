@@ -262,4 +262,12 @@ alias phgrep='cat ~/.persistent_history|grep --color'
 alias pggrep='cat ~/proj/ph_log/.persistent_history|grep --color'
 alias hgrep='history|grep --color'
 
-
+run_remote()
+{
+    if [[ x$REMOTE_HOSTS != x ]]; then
+        for h in $REMOTE_HOSTS; do
+            printf '\E[31m'; echo ssh $h "$@"; printf '\E[0m'
+            ssh $h "$@"
+        done
+    fi
+}
