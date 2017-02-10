@@ -264,10 +264,15 @@ alias hgrep='history|grep --color'
 
 run_remote()
 {
-    if [[ x$REMOTE_HOSTS != x ]]; then
-        for h in $REMOTE_HOSTS; do
-            printf '\E[31m'; echo ssh $h "$@"; printf '\E[0m'
-            ssh $h "$@"
-        done
-    fi
+	if [ -z "${1}" ]; then
+		echo "run_remote: You need to pass a command to run on \$REMOTE_HOSTS"
+		return 1
+	else
+		if [[ x$REMOTE_HOSTS != x ]]; then
+			for h in $REMOTE_HOSTS; do
+				printf '\E[31m'; echo ssh $h "$@"; printf '\E[0m'
+				ssh $h "$@"
+			done
+		fi
+	fi
 }
