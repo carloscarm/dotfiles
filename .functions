@@ -243,7 +243,7 @@ log_bash_persistent_history()
     #if [ "$UID" == "0"]; then
     #    "$host_part"="#@$host_part"
     #fi
-    if [ "$command_part" != "$PERSISTENT_HISTORY_LAST" ]
+    if [[ "$command_part" != "$PERSISTENT_HISTORY_LAST" ]] && [[ "$command_part" != "ls" ]]
     then
         echo $date_part "|" $host_part "|" "$command_part" >> ~/.persistent_history
         export PERSISTENT_HISTORY_LAST="$command_part"
