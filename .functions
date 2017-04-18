@@ -271,7 +271,7 @@ run_remote()
 		if [[ x$REMOTE_HOSTS != x ]]; then
 			for h in $REMOTE_HOSTS; do
 				printf '\E[31m'; echo ssh $h "$@"; printf '\E[0m'
-				ssh $h "$@"
+				ssh -F /home/cmonteli/.ssh/config.noports $h "$@"
 			done
 		fi
 	fi
