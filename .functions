@@ -258,9 +258,41 @@ run_on_prompt_command()
 
 PROMPT_COMMAND="run_on_prompt_command"
 
-alias phgrep='cat ~/.persistent_history|grep --color'
-alias pggrep='cat ~/proj/ph_log/.persistent_history|grep --color'
+#alias vphgrep='cat ~/.persistent_history|grep --color'
+#alias pggrep='cat ~/proj/ph_log/.persistent_history|grep --color'
 alias hgrep='history|grep --color'
+
+vphgrep()
+{
+    if [ -z "${1}" ]; then
+        cat ~/.persistent_history
+    else
+        cat ~/.persistent_history | grep --color "${1}"
+    fi
+}
+
+phgrep()
+{
+    vphgrep "${1}" | cut --delimiter=\| --fields=3-
+}
+
+vpggrep()
+{
+    if [ -r ~/proj/ph_log/.persistent_history ]; then
+        if [ -z "${1}" ]; then
+            cat ~/proj/ph_log/.persistent_history
+        else
+            cat ~/proj/ph_log/.persistent_history | grep --color "${1}"
+        fi
+    fi
+}
+
+pggrep()
+{
+    vphgrep "${1}" | cut --delimiter=\| --fields=3-
+}
+
+
 
 run_remote()
 {
@@ -271,7 +303,11 @@ run_remote()
 		if [[ x$REMOTE_HOSTS != x ]]; then
 			for h in $REMOTE_HOSTS; do
 				printf '\E[31m'; echo ssh $h "$@"; printf '\E[0m'
-				ssh -F /home/cmonteli/.ssh/config.noports $h "$@"
+                if [ -r $HOME/.ssh/config.noports ]; then
+				    ssh -F $HOME/.ssh/config.noports $h "$@"
+                else
+                    ssh $h "$@"
+                fi
 			done
 		fi
 	fi
@@ -281,3 +317,47 @@ gen-etags()
         find . -regex '.*\.\(c\|cpp\|h\)$' -print0 | xargs -0 etags
 }
 
+sv() {
+    local -r ACTION="${1}"
+    if ! grep --extended-regexp --quiet --ignore-case "^(en|dis)abled$" <<< "${ACTION}"; then
+        echo "Wrong arguments ... "
+        return 1
+    fi
+    case "${ACTION}" in
+        'enabled')
+            systemctl list-unit-files | fgrep 'enabled'
+            ;;
+        'disabled')
+            systemctl list-unit-files | fgrep 'disabled'
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+svint() {
+    local -r ACTION="${1}"
+    local svc
+    if ! grep --extended-regexp --quiet --ignore-case "^(e|d)$" <<< "${ACTION}"; then
+        echo "Wrong arguments ... "
+        return 1
+    fi
+    case "${ACTION}" in
+        'd')
+            svc=$(sv enabled | dmenu -b -l 40)
+            if [[ ! -z "${svc}" ]]; then
+                sudo systemctl disable $(awk '{print $1}' <<< ${svc})
+            fi
+            ;;
+        'e')
+            svc=$(sv disabled | dmenu -b -l 40)
+            if [[ ! -z "${svc}" ]]; then
+                sudo systemctl enable $(awk '{print $1}' <<< ${svc})
+            fi
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
