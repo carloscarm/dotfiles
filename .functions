@@ -289,7 +289,7 @@ vpggrep()
 
 pggrep()
 {
-    vphgrep "${1}" | cut --delimiter=\| --fields=3-
+    vpggrep "${1}" | cut --delimiter=\| --fields=3-
 }
 
 
