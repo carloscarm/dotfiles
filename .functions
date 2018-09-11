@@ -267,13 +267,13 @@ vphgrep()
     if [ -z "${1}" ]; then
         cat ~/.persistent_history
     else
-        cat ~/.persistent_history | grep --color "${1}"
+        cat ~/.persistent_history | grep --color "${@}"
     fi
 }
 
 phgrep()
 {
-    vphgrep "${1}" | cut --delimiter=\| --fields=3-
+    vphgrep "${@}" | cut --delimiter=\| --fields=3-
 }
 
 vpggrep()
@@ -282,14 +282,14 @@ vpggrep()
         if [ -z "${1}" ]; then
             cat ~/proj/ph_log/.persistent_history
         else
-            cat ~/proj/ph_log/.persistent_history | grep --color "${1}"
+            cat ~/proj/ph_log/.persistent_history | grep --color "${@}"
         fi
     fi
 }
 
 pggrep()
 {
-    vpggrep "${1}" | cut --delimiter=\| --fields=3-
+    vpggrep "${@}" | cut --delimiter=\| --fields=3-
 }
 
 
