@@ -16,6 +16,7 @@ function doIt() {
 			--exclude "init" \
 			--exclude "brew.sh" \
 			--exclude "make_bkup.sh" \
+			--exclude "check_diffs.sh" \
 			-avh --no-perms . ~;
 	else
 		rsync --exclude ".git/" \
@@ -31,6 +32,7 @@ function doIt() {
 			--exclude "init" \
 			--exclude "brew.sh" \
 			--exclude "make_bkup.sh" \
+			--exclude "check_diffs.sh" \
 			-avh --no-perms . ~;
 	fi
 	source ~/.bash_profile;
