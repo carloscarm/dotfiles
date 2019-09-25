@@ -273,7 +273,7 @@ vphgrep()
 
 phgrep()
 {
-    vphgrep "${@}" | cut --delimiter=\| --fields=3-
+    vphgrep "${@}" | cut --delimiter=\| --fields=3- | sed 's/^ *//'
 }
 
 vpggrep()
@@ -289,7 +289,7 @@ vpggrep()
 
 pggrep()
 {
-    vpggrep "${@}" | cut --delimiter=\| --fields=3-
+    vpggrep "${@}" | cut --delimiter=\| --fields=3- | sed 's/^ *//'
 }
 
 
@@ -360,4 +360,8 @@ svint() {
             return 1
             ;;
     esac
+}
+
+dedupe() {
+    export PATH=$(echo -n $PATH | awk -v RS=: '!($0 in a) {a[$0]; printf("%s%s", length(a) > 1 ? ":" : "", $0)}')
 }
