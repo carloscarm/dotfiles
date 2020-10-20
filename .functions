@@ -273,7 +273,7 @@ vphgrep()
 
 phgrep()
 {
-    vphgrep "${@}" | cut --delimiter=\| --fields=3- | sed 's/^ *//'
+    vphgrep "${@}" | cut -d \| -f 3- | sed 's/^ *//'
 }
 
 vpggrep()
@@ -289,7 +289,7 @@ vpggrep()
 
 pggrep()
 {
-    vpggrep "${@}" | cut --delimiter=\| --fields=3- | sed 's/^ *//'
+    vpggrep "${@}" | cut -d \| -f 3- | sed 's/^ *//'
 }
 
 
